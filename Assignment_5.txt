@@ -1,0 +1,147 @@
+5. Develop a threaded binary tree data structure allowing nodes to efficiently point to their inorder predecessor and successor. Implement an inorder traversal algorithm leveraging these threads.
+
+import java.util.Scanner;
+
+class Node {
+    int data;
+    Node left, right;
+    boolean leftThread, rightThread;
+
+    // Constructor to create a new node
+    Node(int data) {
+        this.data = data;
+        this.left = this.right = null;
+        this.leftThread = this.rightThread = false;
+    }
+}
+
+ class ThreadedBst {
+    public Node root;
+
+    public ThreadedBst() {
+        this.root = null;
+    }
+
+    // Insert method to insert a new node in the threaded BST
+    public void insert(int data) {
+        Node newNode = new Node(data);
+        if (root == null) {
+            root = newNode;
+            return;
+        }
+
+        Node current = root;
+        Node parent = null;
+
+        // Traverse the tree to find the appropriate insertion point
+        while (current != null) {
+            parent = current;
+
+            if (data < current.data) {
+                if (!current.leftThread) {
+                    current = current.left;
+                } else {
+                    break;
+                }
+            } else {
+                if (!current.rightThread) {
+                    current = current.right;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // Now parent is the node where we need to insert the new node
+        if (data < parent.data) {
+            // Insert new node as left child of the parent
+            newNode.left = parent.left;
+            newNode.right = parent;
+            newNode.leftThread = true;
+            newNode.rightThread = true;
+
+            if (parent.leftThread) {
+                parent.leftThread = false;
+            }
+            parent.left = newNode;
+        } else {
+            // Insert new node as right child of the parent
+            newNode.right = parent.right;
+            newNode.left = parent;
+            newNode.leftThread = true;
+            newNode.rightThread = true;
+
+            if (parent.rightThread) {
+                parent.rightThread = false;
+            }
+            parent.right = newNode;
+        }
+    }
+
+    // Helper function to find the leftmost node
+    public Node leftMost(Node temp) {
+        if (temp == null) {
+            return null;
+        }
+        while (!temp.leftThread && temp.left != null) {
+            temp = temp.left;
+        }
+        return temp;
+    }
+
+    // Inorder traversal using threads
+    public void inOrderTraversal() {
+        Node current = leftMost(root);
+
+        while (current != null) {
+            System.out.print(current.data + " ");
+            if (current.rightThread) {
+                current = current.right;
+            } else {
+                current = leftMost(current.right);
+            }
+        }
+        System.out.println();
+    }
+}
+public class Main{
+     // Menu-driven interface
+    public static void main(String[] args) {
+        ThreadedBst tbst = new ThreadedBst();
+        Scanner scanner = new Scanner(System.in);
+        int choice, value;
+
+        do {
+            System.out.println("\nMenu:");
+            System.out.println("1. Insert Node");
+            System.out.println("2. Inorder Traversal");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter value to insert: ");
+                    value = scanner.nextInt();
+                    tbst.insert(value);
+                    break;
+
+                case 2:
+                    System.out.println("Inorder Traversal: ");
+                    tbst.inOrderTraversal();
+                    break;
+
+                case 3:
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        } while (choice != 3);
+
+        scanner.close();
+    }
+}
+
+   

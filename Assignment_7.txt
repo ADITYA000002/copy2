@@ -1,0 +1,111 @@
+7. In a transportation network, construct an optimal road system connecting cities to minimize construction costs while ensuring every city is reachable. Construct Minimum Spanning Tree for this Network and find total cost using KRUSKAL'S Algorithm.
+
+import java.util.*;
+
+class Edge implements Comparable<Edge> {
+    int src, dest, wt;
+
+    Edge(int src, int dest, int wt) {
+        this.src = src;
+        this.dest = dest;
+        this.wt = wt;
+    }
+
+    public int compareTo(Edge other) {
+        return this.wt - other.wt;
+    }
+}
+
+public class Kruskal {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter number of vertices:");
+        int v = scanner.nextInt();  // Number of vertices
+        List<Edge> edges = new ArrayList<>();  // List to store all edges
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Add an edge");
+            System.out.println("2. Calculate MST and total cost");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+
+            if (choice == 1) {
+                // Add an edge
+                System.out.print("Enter source vertex: ");
+                int src = scanner.nextInt();
+                System.out.print("Enter destination vertex: ");
+                int dest = scanner.nextInt();
+                System.out.print("Enter weight of the edge: ");
+                int wt = scanner.nextInt();
+                edges.add(new Edge(src, dest, wt));
+            } else if (choice == 2) {
+                // Calculate MST and total cost
+                runKruskal(v, edges);
+            } else if (choice == 3) {
+                // Exit
+                System.out.println("Exiting...");
+                break;
+            } else {
+                System.out.println("Invalid choice, please try again.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    static void runKruskal(int v, List<Edge> edges) {
+        // Step 1: Sort edges by weight
+        Collections.sort(edges);
+
+        // Step 2: Initialize the disjoint-set (Union-Find) data structures
+        int[] parent = new int[v];
+        int[] rank = new int[v];
+        for (int i = 0; i < v; i++) {
+            parent[i] = i;  // Each node is its own parent initially
+            rank[i] = 0;    // Rank (or height) of each node is 0
+        }
+
+        // Step 3: Build MST by adding edges (if no cycle is formed)
+        List<Edge> mst = new ArrayList<>();
+        int mstCost = 0;
+
+        for (Edge edge : edges) {
+            int root1 = find(parent, edge.src);
+            int root2 = find(parent, edge.dest);
+
+            if (root1 != root2) {
+                mst.add(edge);
+                mstCost += edge.wt;
+                union(parent, rank, root1, root2);
+            }
+        }
+
+        // Output the MST and its total cost
+        System.out.println("Edges in the Minimum Spanning Tree:");
+        for (Edge edge : mst) {
+            System.out.println(edge.src + " -- " + edge.dest + " == " + edge.wt);
+        }
+        System.out.println("Total cost of MST: " + mstCost);
+    }
+
+    static int find(int[] parent, int node) {
+        if (parent[node] != node) {
+            parent[node] = find(parent, parent[node]);
+        }
+        return parent[node];
+    }
+
+    static void union(int[] parent, int[] rank, int root1, int root2) {
+        if (rank[root1] < rank[root2]) {
+            parent[root1] = root2;
+        } else if (rank[root1] > rank[root2]) {
+            parent[root2] = root1;
+        } else {
+            parent[root2] = root1;
+            rank[root1]++;
+        }
+    }
+}

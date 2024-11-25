@@ -1,0 +1,119 @@
+9. Read the marks obtained by students of second year in an online examination of particular subject. Find out the maximum and minimum marks obtained in that subject. Use Min Heap data structure and find the lowest marks.
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+class MinHeap {
+    private ArrayList<Integer> heap;
+
+    public MinHeap() {
+        heap = new ArrayList<>();
+    }
+
+    // Insert a value into the heap
+    public void insert(int value) {
+        heap.add(value); // Add the value at the end
+        int index = heap.size() - 1;
+
+        // Heapify up to maintain the Min Heap property
+        while (index > 0) {
+            int parentIndex = (index - 1) / 2;
+
+            if (heap.get(index) >= heap.get(parentIndex)) {
+                break;
+            }
+
+            // Simplified swap using Collections.swap
+            Collections.swap(heap, index, parentIndex);
+
+            index = parentIndex;
+        }
+    }
+
+    // Get the minimum value (root of the heap)
+    public int getMinimum() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is Empty");
+            return -1; // or another sentinel value indicating an empty heap
+        }
+        return heap.get(0);
+    }
+
+    // Get the maximum value by scanning the heap
+    public int getMaximum() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty");
+            return -1; // or another sentinel value indicating an empty heap
+        }
+        int max = Integer.MIN_VALUE;
+        for (int value : heap) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
+    // Display the heap elements
+    public void displayHeap() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty!");
+        } else {
+            System.out.println("Heap elements: " + heap);
+        }
+    }
+}
+
+public class MinHeapMenu {
+    public static void main(String[] args) {
+        MinHeap minHeap = new MinHeap();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Menu ---");
+            System.out.println("1. Insert marks");
+            System.out.println("2. Find minimum marks");
+            System.out.println("3. Find maximum marks");
+            System.out.println("4. Display heap");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the marks to insert: ");
+                    int marks = scanner.nextInt();
+                    minHeap.insert(marks);
+                    System.out.println("Marks added to the heap.");
+                    break;
+
+                case 2:
+                    int min = minHeap.getMinimum();
+                    if (min != -1) {
+                        System.out.println("Minimum marks: " + min);
+                    }
+                    break;
+
+                case 3:
+                    int max = minHeap.getMaximum();
+                    if (max != -1) {
+                        System.out.println("Maximum marks: " + max);
+                    }
+                    break;
+
+                case 4:
+                    minHeap.displayHeap();
+                    break;
+
+                case 5:
+                    System.out.println("Exiting program...");
+                    scanner.close();
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}

@@ -1,0 +1,128 @@
+1. Implement Stack and all its operations using Linked List.
+
+import java.util.Scanner;
+
+// Class representing a Node in the Linked List
+class Node {
+    int data;
+    Node next;
+
+    public Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+// Stack implementation using a Linked List
+class Stack {
+    private Node top; // Points to the top of the stack
+
+    // Constructor
+    public Stack() {
+        this.top = null;
+    }
+
+    // Push operation: Adds an element to the top of the stack
+    public void push(int data) {
+        Node newNode = new Node(data);
+        newNode.next = top;
+        top = newNode;
+        System.out.println(data + " pushed to stack.");
+    }
+
+    // Pop operation: Removes and returns the top element of the stack
+    public int pop() {
+        if (isEmpty()) {
+            System.out.println("Stack Underflow! No elements to pop.");
+            return -1;
+        }
+        int poppedData = top.data;
+        top = top.next;
+        return poppedData;
+    }
+
+    // Peek operation: Returns the top element of the stack without removing it
+    public int peek() {
+        if (isEmpty()) {
+            System.out.println("Stack is empty.");
+            return -1;
+        }
+        return top.data;
+    }
+
+    // Check if the stack is empty
+    public boolean isEmpty() {
+        return top == null;
+    }
+
+    // Print all elements of the stack
+    public void printStack() {
+        if (isEmpty()) {
+            System.out.println("Stack is empty.");
+            return;
+        }
+        Node temp = top;
+        System.out.print("Stack elements: ");
+        while (temp != null) {
+            System.out.print(temp.data + " ");
+            temp = temp.next;
+        }
+        System.out.println();
+    }
+}
+
+// Main class for the menu-driven program
+public class StackMenuDriven {
+    public static void main(String[] args) {
+        Stack stack = new Stack();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n===== Stack Operations Menu =====");
+            System.out.println("1. Push");
+            System.out.println("2. Pop");
+            System.out.println("3. Peek");
+            System.out.println("4. Print Stack");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1: // Push
+                    System.out.print("Enter the value to push: ");
+                    int value = scanner.nextInt();
+                    stack.push(value);
+                    break;
+
+                case 2: // Pop
+                    int poppedValue = stack.pop();
+                    if (poppedValue != -1) {
+                        System.out.println("Popped value: " + poppedValue);
+                    }
+                    break;
+
+                case 3: // Peek
+                    int topValue = stack.peek();
+                    if (topValue != -1) {
+                        System.out.println("Top element is: " + topValue);
+                    }
+                    break;
+
+                case 4: // Print Stack
+                    stack.printStack();
+                    break;
+
+                case 5: // Exit
+                    System.out.println("Exiting program. Goodbye!");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        } while (choice != 5);
+
+        scanner.close();
+    }
+}
+

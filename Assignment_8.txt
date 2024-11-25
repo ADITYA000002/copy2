@@ -1,0 +1,103 @@
+8. You are tasked with optimizing delivery routes for a courier service in a city with multiple pickup and delivery locations. The courier service wants to minimize the total distance travelled while ensuring timely deliveries to all destinations. Find the shortest paths between these locations using the DIJKSTRA algorithm.
+
+import java.util.*;
+
+class DijkstraAlgorithm {
+    private int vertices;  // Number of locations
+    private int[][] adjacencyMatrix; // Distance matrix
+
+    DijkstraAlgorithm(int vertices, int[][] adjacencyMatrix) {
+        this.vertices = vertices;
+        this.adjacencyMatrix = adjacencyMatrix;
+    }
+
+    void findShortestPaths(int source) {
+        int[] distances = new int[vertices]; // Shortest distance from source to each vertex
+        boolean[] visited = new boolean[vertices]; // Tracks visited vertices
+
+        // Initialize distances and visited array
+        Arrays.fill(distances, Integer.MAX_VALUE);
+        distances[source] = 0;
+
+        for (int i = 0; i < vertices - 1; i++) {
+            // Pick the minimum distance vertex from the unvisited set
+            int u = getMinDistanceVertex(distances, visited);
+            visited[u] = true;
+
+            // Update the distance values of the adjacent vertices
+            for (int v = 0; v < vertices; v++) {
+                if (!visited[v] && adjacencyMatrix[u][v] != 0 &&
+                        distances[u] != Integer.MAX_VALUE &&
+                        distances[u] + adjacencyMatrix[u][v] < distances[v]) {
+                    distances[v] = distances[u] + adjacencyMatrix[u][v];
+                }
+            }
+        }
+
+        // Print the shortest distances
+        printShortestPaths(source, distances);
+    }
+
+    private int getMinDistanceVertex(int[] distances, boolean[] visited) {
+        int minDistance = Integer.MAX_VALUE, minIndex = -1;
+
+        for (int i = 0; i < vertices; i++) {
+            if (!visited[i] && distances[i] < minDistance) {
+                minDistance = distances[i];
+                minIndex = i;
+            }
+        }
+        return minIndex;
+    }
+
+    private void printShortestPaths(int source, int[] distances) {
+        System.out.println("\nShortest paths from location " + source + ":");
+        for (int i = 0; i < vertices; i++) {
+            System.out.println("To location " + i + " -> Distance: " + distances[i]);
+        }
+    }
+}
+
+public class CourierRouteOptimization {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of locations: ");
+        int vertices = scanner.nextInt();
+
+        System.out.println("Enter the adjacency matrix (use 0 for no direct route):");
+        int[][] adjacencyMatrix = new int[vertices][vertices];
+        for (int i = 0; i < vertices; i++) {
+            for (int j = 0; j < vertices; j++) {
+                adjacencyMatrix[i][j] = scanner.nextInt();
+            }
+        }
+
+        DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(vertices, adjacencyMatrix);
+
+        while (true) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Find Shortest Paths from a Source");
+            System.out.println("2. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the source location: ");
+                    int source = scanner.nextInt();
+                    if (source < 0 || source >= vertices) {
+                        System.out.println("Invalid source location. Try again.");
+                        break;
+                    }
+                    dijkstra.findShortestPaths(source);
+                    break;
+                case 2:
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+}

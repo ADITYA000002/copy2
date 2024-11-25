@@ -1,0 +1,283 @@
+6. In a transportation network, construct an optimal road system connecting cities to minimize construction costs while ensuring every city is reachable. Construct Minimum Spanning Tree for this Network and find total cost using PRIMs Algorithm.
+
+using Adjacency matrix:
+
+import java.util.Scanner;
+
+class Graph {
+    private int V; // Number of cities (vertices)
+    private int[][] graph; // Adjacency matrix for the graph
+
+    public Graph(int v) {
+        V = v;
+        graph = new int[V][V];
+
+        // Initialize the adjacency matrix with -1 (indicating no road)
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                graph[i][j] = -1; // No edge initially
+            }
+        }
+    }
+
+    // Add road between cities with a cost
+    public void addRoad(int city1, int city2, int cost) {
+        graph[city1][city2] = cost;
+        graph[city2][city1] = cost; // As the road is undirected
+    }
+
+    // Prim's algorithm to find MST and total cost
+    public void primMST() {
+        // To track the vertices included in MST
+        boolean[] inMST = new boolean[V];
+
+        // Array to store the minimum edge cost to add a vertex to the MST
+        int[] key = new int[V];
+        // To store the parent of a vertex in the MST
+        int[] parent = new int[V];
+
+        // Initialize all keys to infinity and parent to -1
+        for (int i = 0; i < V; i++) {
+            key[i] = Integer.MAX_VALUE;
+            parent[i] = -1;
+            inMST[i] = false;
+        }
+
+        // Start with the first city (vertex 0)
+        key[0] = 0;
+
+        int totalCost = 0;
+
+        // Perform Prim's algorithm
+        for (int count = 0; count < V - 1; count++) {
+            // Find the vertex with the minimum key value that is not yet in MST
+            int u = minKey(key, inMST);
+            inMST[u] = true;
+
+            // Update the key and parent values of the adjacent vertices of u
+            for (int v = 0; v < V; v++) {
+                if (graph[u][v] != -1 && !inMST[v] && graph[u][v] < key[v]) {
+                    key[v] = graph[u][v];
+                    parent[v] = u;
+                }
+            }
+        }
+
+        // Calculate the total cost and print the MST edges
+        System.out.println("Edges in MST:");
+        for (int i = 1; i < V; i++) {
+            if (parent[i] != -1) {
+                System.out.println("City " + parent[i] + " - City " + i + " with cost: " + graph[parent[i]][i]);
+                totalCost += graph[parent[i]][i];
+            }
+        }
+
+        System.out.println("Total cost of constructing the road system (MST): " + totalCost);
+    }
+
+    // Utility method to find the vertex with the minimum key value
+    private int minKey(int[] key, boolean[] inMST) {
+        int min = Integer.MAX_VALUE, minIndex = -1;
+
+        for (int v = 0; v < V; v++) {
+            if (!inMST[v] && key[v] < min) {
+                min = key[v];
+                minIndex = v;
+            }
+        }
+
+        return minIndex;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int choice, city1, city2, cost, numCities;
+
+        System.out.print("Enter the number of cities: ");
+        numCities = scanner.nextInt();
+        Graph graph = new Graph(numCities);
+
+        do {
+            System.out.println("\nMenu:");
+            System.out.println("1. Add Road between Cities");
+            System.out.println("2. Construct Minimum Spanning Tree (MST)");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the first city (0 to " + (numCities - 1) + "): ");
+                    city1 = scanner.nextInt();
+                    System.out.print("Enter the second city (0 to " + (numCities - 1) + "): ");
+                    city2 = scanner.nextInt();
+                    System.out.print("Enter the cost of constructing the road: ");
+                    cost = scanner.nextInt();
+                    graph.addRoad(city1, city2, cost);
+                    System.out.println("Road added.");
+                    break;
+
+                case 2:
+                    System.out.println("Constructing Minimum Spanning Tree (MST)...");
+                    graph.primMST();
+                    break;
+
+                case 3:
+                    System.out.println("Exiting...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        } while (choice != 3);
+
+        scanner.close();
+    }
+}
+
+
+
+
+
+using adjacency list:
+
+import java.util.*;
+
+public class PrimMST {
+    // Class to represent a weighted edge between two vertices
+    static class Edge {
+        int dest, weight;
+        Edge(int dest, int weight) {
+            this.dest = dest;
+            this.weight = weight;
+        }
+    }
+
+    // Function to perform Prim's algorithm using an adjacency list
+    public static void primMST(int n, ArrayList<ArrayList<Edge>> adjList) {
+        // To track vertices included in MST
+        boolean[] inMST = new boolean[n];
+        // Array to store the minimum edge weight to reach a vertex
+        int[] key = new int[n];
+        // Array to store the parent of a vertex in MST
+        int[] parent = new int[n];
+
+        // Priority queue to choose the edge with the minimum weight (min-heap)
+        PriorityQueue<Edge> pq = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight));
+
+        // Initialize all key values as infinite, and set parent and inMST arrays
+        Arrays.fill(key, Integer.MAX_VALUE);
+        Arrays.fill(parent, -1);
+        Arrays.fill(inMST, false);
+
+        // Start with vertex 0
+        key[0] = 0;
+        pq.add(new Edge(0, 0));
+
+        int totalCost = 0;  // Variable to store the total cost of the MST
+
+        while (!pq.isEmpty()) {
+            Edge current = pq.poll();
+            int u = current.dest;
+
+            // Skip if the vertex is already included in MST
+            if (inMST[u]) continue;
+
+            // Add the weight of the edge to the total MST cost
+            totalCost += current.weight;
+            inMST[u] = true;  // Mark vertex u as included in MST
+
+            // For each neighbor of the current vertex
+            for (Edge edge : adjList.get(u)) {
+                int v = edge.dest;
+                int weight = edge.weight;
+
+                // If vertex v is not in MST and weight of the edge is smaller than the current key
+                if (!inMST[v] && weight < key[v]) {
+                    key[v] = weight;
+                    parent[v] = u;
+                    pq.add(new Edge(v, weight));  // Add this vertex to the priority queue
+                }
+            }
+        }
+
+        // Print the edges in the MST and the total cost
+        System.out.println("Edges in the MST:");
+        for (int i = 1; i < n; i++) {
+            if (parent[i] != -1) {
+                System.out.println("City " + parent[i] + " - City " + i + " with cost: " + key[i]);
+            }
+        }
+        System.out.println("Total cost of MST: " + totalCost);
+    }
+
+    // Menu-driven method to interact with the user
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<ArrayList<Edge>> adjList = new ArrayList<>();
+        int n = 0;  // Number of cities (vertices)
+
+        while (true) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Create Graph");
+            System.out.println("2. Add Road");
+            System.out.println("3. Find MST (Minimum Spanning Tree)");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the number of cities: ");
+                    n = scanner.nextInt();
+                    adjList.clear();
+                    for (int i = 0; i < n; i++) {
+                        adjList.add(new ArrayList<>());
+                    }
+                    System.out.println("Graph created with " + n + " cities.");
+                    break;
+
+                case 2:
+                    if (n == 0) {
+                        System.out.println("Please create the graph first!");
+                        break;
+                    }
+                    System.out.print("Enter the source city (0 to " + (n - 1) + "): ");
+                    int city1 = scanner.nextInt();
+                    System.out.print("Enter the destination city (0 to " + (n - 1) + "): ");
+                    int city2 = scanner.nextInt();
+                    System.out.print("Enter the cost of the road: ");
+                    int cost = scanner.nextInt();
+
+                    // Add roads (edges) to both directions
+                    adjList.get(city1).add(new Edge(city2, cost));
+                    adjList.get(city2).add(new Edge(city1, cost));
+                    System.out.println("Road added between City " + city1 + " and City " + city2 + " with cost: " + cost);
+                    break;
+
+                case 3:
+                    if (n == 0) {
+                        System.out.println("Please create the graph first!");
+                        break;
+                    }
+                    System.out.println("Finding MST...");
+                    primMST(n, adjList);
+                    break;
+
+                case 4:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
+
+
+
